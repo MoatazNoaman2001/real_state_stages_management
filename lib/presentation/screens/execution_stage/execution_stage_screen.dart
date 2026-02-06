@@ -11,6 +11,7 @@ import '../../blocs/execution_stage/execution_stage_bloc.dart';
 import '../../widgets/layout/app_layout.dart';
 import '../../widgets/common/app_card.dart';
 import '../../widgets/common/app_button.dart';
+import '../../widgets/common/customer_search_field.dart';
 
 class ExecutionStageScreen extends StatelessWidget {
   final int? initialCustomerId;
@@ -40,8 +41,6 @@ class ExecutionStageScreenView extends StatefulWidget {
 
 class _ExecutionStageScreenViewState extends State<ExecutionStageScreenView> {
   Customer? _selectedCustomer;
-  List<Customer> _customers = [];
-  bool _loadingCustomers = true;
 
   // Step names in order
   static const _stepNames = [
@@ -93,30 +92,20 @@ class _ExecutionStageScreenViewState extends State<ExecutionStageScreenView> {
   @override
   void initState() {
     super.initState();
-    _loadCustomers();
+    _loadInitialCustomer();
   }
 
-  Future<void> _loadCustomers() async {
+  Future<void> _loadInitialCustomer() async {
+    if (widget.initialCustomerId == null) return;
     try {
-      final customers = await getIt<CustomerService>().getAllCustomers();
-      setState(() {
-        _customers = customers;
-        _loadingCustomers = false;
-
-        // Auto-select customer if initialCustomerId is provided
-        if (widget.initialCustomerId != null) {
-          final initial = customers.where((c) => c.id == widget.initialCustomerId).firstOrNull;
-          if (initial != null) {
-            _selectedCustomer = initial;
-            context.read<ExecutionStageBloc>().add(
-              LoadExecutionStageForCustomer(initial.id),
-            );
-          }
-        }
-      });
-    } catch (e) {
-      setState(() => _loadingCustomers = false);
-    }
+      final customer = await getIt<CustomerService>().getCustomer(widget.initialCustomerId!);
+      if (customer != null && mounted) {
+        setState(() => _selectedCustomer = customer);
+        context.read<ExecutionStageBloc>().add(
+          LoadExecutionStageForCustomer(customer.id),
+        );
+      }
+    } catch (_) {}
   }
 
   @override
@@ -155,29 +144,17 @@ class _ExecutionStageScreenViewState extends State<ExecutionStageScreenView> {
     return AppSectionCard(
       title: 'اختيار العميل',
       icon: Icons.person_outline,
-      child: _loadingCustomers
-          ? const LinearProgressIndicator()
-          : DropdownButtonFormField<Customer>(
-              decoration: const InputDecoration(
-                labelText: 'اختر العميل',
-                border: OutlineInputBorder(),
-              ),
-              value: _selectedCustomer,
-              items: _customers.map((c) {
-                return DropdownMenuItem(
-                  value: c,
-                  child: Text('${c.customerName} - قطعة ${c.plotNumber}'),
+      child: CustomerSearchField(
+        initialCustomer: _selectedCustomer,
+        onSelected: (customer) {
+          setState(() => _selectedCustomer = customer);
+          if (customer != null) {
+            context.read<ExecutionStageBloc>().add(
+                  LoadExecutionStageForCustomer(customer.id),
                 );
-              }).toList(),
-              onChanged: (customer) {
-                setState(() => _selectedCustomer = customer);
-                if (customer != null) {
-                  context.read<ExecutionStageBloc>().add(
-                        LoadExecutionStageForCustomer(customer.id),
-                      );
-                }
-              },
-            ),
+          }
+        },
+      ),
     );
   }
 

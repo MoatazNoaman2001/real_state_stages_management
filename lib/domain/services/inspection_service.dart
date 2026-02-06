@@ -38,11 +38,6 @@ class InspectionService {
       throw NotFoundException('العميل غير موجود');
     }
 
-    // Validate date is in the future
-    if (inspectionDate.isBefore(DateTime.now())) {
-      throw ValidationException('تاريخ المعاينة يجب أن يكون في المستقبل');
-    }
-
     final inspection = Inspection(
       id: 0,
       customerId: customerId,
@@ -104,10 +99,6 @@ class InspectionService {
     final inspection = await _inspectionRepo.findById(inspectionId);
     if (inspection == null) {
       throw NotFoundException('المعاينة غير موجودة');
-    }
-
-    if (newDate.isBefore(DateTime.now())) {
-      throw ValidationException('تاريخ المعاينة يجب أن يكون في المستقبل');
     }
 
     final updated = inspection.copyWith(

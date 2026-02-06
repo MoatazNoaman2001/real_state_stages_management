@@ -92,7 +92,7 @@ class CustomerService {
   /// Search customers
   Future<List<Customer>> searchCustomers(String query) async {
     if (query.trim().isEmpty) {
-      return Future.value([]);
+      return await _repository.findAll(orderBy: 'customer_name');
     }
     return await _repository.search(query);
   }

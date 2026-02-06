@@ -2,6 +2,7 @@
 export 'app_button.dart';
 export 'app_card.dart';
 export 'app_checkbox_tile.dart';
+export 'customer_search_field.dart';
 export 'app_data_table.dart';
 export 'app_dialog.dart';
 export 'app_progress.dart';

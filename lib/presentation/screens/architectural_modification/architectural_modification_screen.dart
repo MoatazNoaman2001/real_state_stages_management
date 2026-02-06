@@ -8,6 +8,7 @@ import '../../../domain/services/customer_service.dart';
 import '../../widgets/layout/app_layout.dart';
 import '../../widgets/common/app_card.dart';
 import '../../widgets/common/app_button.dart';
+import '../../widgets/common/customer_search_field.dart';
 
 class ArchitecturalModificationScreen extends StatelessWidget {
   final int? initialCustomerId;
@@ -31,8 +32,6 @@ class _ArchitecturalModificationView extends StatefulWidget {
 
 class _ArchitecturalModificationViewState extends State<_ArchitecturalModificationView> {
   Customer? _selectedCustomer;
-  List<Customer> _customers = [];
-  bool _loadingCustomers = true;
   ArchitecturalModification? _modification;
   bool _loadingModification = false;
   String? _error;
@@ -84,27 +83,18 @@ class _ArchitecturalModificationViewState extends State<_ArchitecturalModificati
   @override
   void initState() {
     super.initState();
-    _loadCustomers();
+    _loadInitialCustomer();
   }
 
-  Future<void> _loadCustomers() async {
+  Future<void> _loadInitialCustomer() async {
+    if (widget.initialCustomerId == null) return;
     try {
-      final customers = await getIt<CustomerService>().getAllCustomers();
-      setState(() {
-        _customers = customers;
-        _loadingCustomers = false;
-
-        if (widget.initialCustomerId != null) {
-          final initial = customers.where((c) => c.id == widget.initialCustomerId).firstOrNull;
-          if (initial != null) {
-            _selectedCustomer = initial;
-            _loadModification(initial.id);
-          }
-        }
-      });
-    } catch (e) {
-      setState(() => _loadingCustomers = false);
-    }
+      final customer = await getIt<CustomerService>().getCustomer(widget.initialCustomerId!);
+      if (customer != null && mounted) {
+        setState(() => _selectedCustomer = customer);
+        _loadModification(customer.id);
+      }
+    } catch (_) {}
   }
 
   Future<void> _loadModification(int customerId) async {
@@ -274,27 +264,15 @@ class _ArchitecturalModificationViewState extends State<_ArchitecturalModificati
     return AppSectionCard(
       title: 'اختيار العميل',
       icon: Icons.person_outline,
-      child: _loadingCustomers
-          ? const LinearProgressIndicator()
-          : DropdownButtonFormField<Customer>(
-              decoration: const InputDecoration(
-                labelText: 'اختر العميل',
-                border: OutlineInputBorder(),
-              ),
-              value: _selectedCustomer,
-              items: _customers.map((c) {
-                return DropdownMenuItem(
-                  value: c,
-                  child: Text(c.customerName),
-                );
-              }).toList(),
-              onChanged: (customer) {
-                setState(() => _selectedCustomer = customer);
-                if (customer != null) {
-                  _loadModification(customer.id);
-                }
-              },
-            ),
+      child: CustomerSearchField(
+        initialCustomer: _selectedCustomer,
+        onSelected: (customer) {
+          setState(() => _selectedCustomer = customer);
+          if (customer != null) {
+            _loadModification(customer.id);
+          }
+        },
+      ),
     );
   }
 

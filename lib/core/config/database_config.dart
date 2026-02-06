@@ -1,26 +1,34 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class DatabaseConfig {
-  // PostgreSQL Connection Details
-  static const String host = 'localhost';
-  static const int port = 5432;
-  static const String database = 'real_state_db';
-  static const String username = 'real_state_user';
-  static const String password = 'Alemam252520';
+  static String get connectionString =>
+      dotenv.env['DATABASE_URL'] ??
+      'postgres://real_state_user:password@localhost:5432/real_state';
+
+  // Parse individual components from DATABASE_URL
+  static Uri get _uri => Uri.parse(connectionString);
+
+  static String get host => _uri.host;
+  static int get port => _uri.port;
+  static String get database => _uri.path.substring(1); // remove leading '/'
+  static String get username => _uri.userInfo.split(':').first;
+  static String get password => _uri.userInfo.split(':').last;
 
   // Connection Settings
-  static const int connectionTimeoutSeconds = 30;
-  static const int queryTimeoutSeconds = 60;
+  static int get connectionTimeoutSeconds =>
+      int.tryParse(dotenv.env['CONNECTION_TIMEOUT_SECONDS'] ?? '') ?? 30;
+
+  static int get queryTimeoutSeconds =>
+      int.tryParse(dotenv.env['QUERY_TIMEOUT_SECONDS'] ?? '') ?? 60;
 
   // Retry Settings
-  static const int maxRetries = 3;
-  static const Duration retryDelay = Duration(seconds: 2);
+  static int get maxRetries =>
+      int.tryParse(dotenv.env['MAX_RETRIES'] ?? '') ?? 3;
 
-  // Get connection string (basic format for postgres package)
-  static String get connectionString {
-    return 'postgres://$username:$password@$host:$port/$database';
-        // 'connection_timeout=${connectionTimeout.toString()}&'
-        // 'max_connection_count=10';
-  }
-
+  static Duration get retryDelay => Duration(
+        seconds:
+            int.tryParse(dotenv.env['RETRY_DELAY_SECONDS'] ?? '') ?? 2,
+      );
 
   // Get connection timeout as Duration
   static Duration get connectionTimeout =>

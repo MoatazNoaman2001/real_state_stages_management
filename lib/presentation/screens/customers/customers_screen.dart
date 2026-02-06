@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/models/customer.dart';
 import '../../blocs/customer/customer_bloc.dart';
@@ -9,6 +10,7 @@ import '../../widgets/common/app_data_table.dart';
 import '../../widgets/common/app_dialog.dart';
 import '../../widgets/common/app_text_field.dart';
 import '../../widgets/layout/app_layout.dart';
+import '../customer/customer_stages_screen.dart';
 
 class CustomersScreen extends StatefulWidget {
   const CustomersScreen({super.key});
@@ -471,14 +473,17 @@ class _CustomersScreenState extends State<CustomersScreen> {
     final nameController = TextEditingController();
     final ownerController = TextEditingController();
     final plotController = TextEditingController();
+    final projectNumberController = TextEditingController();
     final phoneController = TextEditingController();
     final addressController = TextEditingController();
+    final usernameController = TextEditingController();
+    final passwordController = TextEditingController();
     final notesController = TextEditingController();
 
     AppDialog.show(
       context: context,
       builder: (dialogContext) => AppFormDialog(
-        title: 'إضافة عميل جديد',
+        title: '\u0625\u0636\u0627\u0641\u0629 \u0639\u0645\u064a\u0644 \u062c\u062f\u064a\u062f',
         width: 600,
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -487,25 +492,17 @@ class _CustomersScreenState extends State<CustomersScreen> {
               children: [
                 Expanded(
                   child: AppTextField(
-                    label: 'اسم العميل',
-                    hint: 'أدخل اسم العميل',
+                    label: '\u0627\u0633\u0645 \u0627\u0644\u0639\u0645\u064a\u0644',
+                    hint: '\u0623\u062f\u062e\u0644 \u0627\u0633\u0645 \u0627\u0644\u0639\u0645\u064a\u0644',
                     prefixIcon: Icons.person_outline,
-                    // decoration: InputDecoration(
-
-                      // border: OutlineInputBorder(
-                      //   borderSide: BorderSide(width: 0)
-                      // ),
-                      // filled: true,
-                      // helper: Text('اكتب اسم العميل لبدا انشاء رخصة جديدة')
-                    // ),
                     controller: nameController,
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: AppTextField(
-                    label: 'اسم المالك',
-                    hint: 'أدخل اسم المالك',
+                    label: '\u0627\u0633\u0645 \u0627\u0644\u0645\u0627\u0644\u0643',
+                    hint: '\u0623\u062f\u062e\u0644 \u0627\u0633\u0645 \u0627\u0644\u0645\u0627\u0644\u0643',
                     prefixIcon: Icons.person_outline,
                     controller: ownerController,
                   ),
@@ -517,8 +514,8 @@ class _CustomersScreenState extends State<CustomersScreen> {
               children: [
                 Expanded(
                   child: AppTextField(
-                    label: 'رقم القطعة',
-                    hint: 'مثال: قطعة 45',
+                    label: '\u0631\u0642\u0645 \u0627\u0644\u0642\u0637\u0639\u0629',
+                    hint: '\u0645\u062b\u0627\u0644: \u0642\u0637\u0639\u0629 45',
                     prefixIcon: Icons.location_on_outlined,
                     controller: plotController,
                   ),
@@ -526,27 +523,64 @@ class _CustomersScreenState extends State<CustomersScreen> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: AppTextField(
-                    label: 'رقم الهاتف',
+                    label: '\u0631\u0642\u0645 \u0627\u0644\u0645\u0634\u0631\u0648\u0639',
+                    hint: '\u0623\u062f\u062e\u0644 \u0631\u0642\u0645 \u0627\u0644\u0645\u0634\u0631\u0648\u0639',
+                    prefixIcon: Icons.assignment_outlined,
+                    controller: projectNumberController,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: AppTextField(
+                    label: '\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062a\u0641',
                     hint: '01xxxxxxxxx',
                     prefixIcon: Icons.phone_outlined,
                     keyboardType: TextInputType.phone,
                     controller: phoneController,
                   ),
                 ),
+                const SizedBox(width: 16),
+                const Expanded(child: SizedBox()),
               ],
             ),
             const SizedBox(height: 16),
             AppTextField(
-              label: 'العنوان',
-              hint: 'أدخل العنوان التفصيلي',
+              label: '\u0627\u0644\u0639\u0646\u0648\u0627\u0646',
+              hint: '\u0623\u062f\u062e\u0644 \u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u062a\u0641\u0635\u064a\u0644\u064a',
               prefixIcon: Icons.home_outlined,
               maxLines: 2,
               controller: addressController,
             ),
             const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: AppTextField(
+                    label: '\u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645',
+                    hint: '\u0623\u062f\u062e\u0644 \u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645',
+                    prefixIcon: Icons.account_circle_outlined,
+                    controller: usernameController,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: AppTextField(
+                    label: '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
+                    hint: '\u0623\u062f\u062e\u0644 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
+                    prefixIcon: Icons.lock_outline,
+                    controller: passwordController,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
             AppTextField(
-              label: 'ملاحظات',
-              hint: 'ملاحظات إضافية...',
+              label: '\u0645\u0644\u0627\u062d\u0638\u0627\u062a',
+              hint: '\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0625\u0636\u0627\u0641\u064a\u0629...',
               maxLines: 3,
               controller: notesController,
             ),
@@ -556,11 +590,22 @@ class _CustomersScreenState extends State<CustomersScreen> {
           if (nameController.text.isEmpty || plotController.text.isEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('يرجى إدخال اسم العميل ورقم القطعة'),
+                content: Text('\u064a\u0631\u062c\u0649 \u0625\u062f\u062e\u0627\u0644 \u0627\u0633\u0645 \u0627\u0644\u0639\u0645\u064a\u0644 \u0648\u0631\u0642\u0645 \u0627\u0644\u0642\u0637\u0639\u0629'),
                 backgroundColor: Colors.red,
               ),
             );
             return;
+          }
+
+          // Combine address and notes
+          final address = addressController.text.trim();
+          final notes = notesController.text.trim();
+          String? combinedNotes;
+          if (address.isNotEmpty || notes.isNotEmpty) {
+            final parts = <String>[];
+            if (address.isNotEmpty) parts.add('\u0627\u0644\u0639\u0646\u0648\u0627\u0646: $address');
+            if (notes.isNotEmpty) parts.add(notes);
+            combinedNotes = parts.join('\n');
           }
 
           final customer = Customer(
@@ -568,8 +613,11 @@ class _CustomersScreenState extends State<CustomersScreen> {
             customerName: nameController.text,
             ownerName: ownerController.text.isEmpty ? null : ownerController.text,
             plotNumber: plotController.text,
+            projectNumber: projectNumberController.text.isEmpty ? null : projectNumberController.text,
+            username: usernameController.text.isEmpty ? null : usernameController.text,
+            password: passwordController.text.isEmpty ? null : passwordController.text,
             phone: phoneController.text.isEmpty ? null : phoneController.text,
-            notes: notesController.text.isEmpty ? null : notesController.text,
+            notes: combinedNotes,
             createdAt: DateTime.now(),
             updatedAt: DateTime.now(),
           );
@@ -582,16 +630,38 @@ class _CustomersScreenState extends State<CustomersScreen> {
   }
 
   void _showEditCustomerDialog(Customer customer) {
+    // Extract address from notes
+    String existingAddress = '';
+    String existingNotes = '';
+    if (customer.notes != null) {
+      final lines = customer.notes!.split('\n');
+      final addressLines = <String>[];
+      final noteLines = <String>[];
+      for (final line in lines) {
+        if (line.startsWith('\u0627\u0644\u0639\u0646\u0648\u0627\u0646: ')) {
+          addressLines.add(line.replaceFirst('\u0627\u0644\u0639\u0646\u0648\u0627\u0646: ', ''));
+        } else {
+          noteLines.add(line);
+        }
+      }
+      existingAddress = addressLines.join('\n');
+      existingNotes = noteLines.join('\n');
+    }
+
     final nameController = TextEditingController(text: customer.customerName);
     final ownerController = TextEditingController(text: customer.ownerName ?? '');
     final plotController = TextEditingController(text: customer.plotNumber);
+    final projectNumberController = TextEditingController(text: customer.projectNumber ?? '');
     final phoneController = TextEditingController(text: customer.phone ?? '');
-    final notesController = TextEditingController(text: customer.notes ?? '');
+    final addressController = TextEditingController(text: existingAddress);
+    final usernameController = TextEditingController(text: customer.username ?? '');
+    final passwordController = TextEditingController(text: customer.password ?? '');
+    final notesController = TextEditingController(text: existingNotes);
 
     AppDialog.show(
       context: context,
       builder: (dialogContext) => AppFormDialog(
-        title: 'تعديل بيانات العميل',
+        title: '\u062a\u0639\u062f\u064a\u0644 \u0628\u064a\u0627\u0646\u0627\u062a \u0627\u0644\u0639\u0645\u064a\u0644',
         width: 600,
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -600,7 +670,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
               children: [
                 Expanded(
                   child: AppTextField(
-                    label: 'اسم العميل',
+                    label: '\u0627\u0633\u0645 \u0627\u0644\u0639\u0645\u064a\u0644',
                     prefixIcon: Icons.person_outline,
                     controller: nameController,
                   ),
@@ -608,37 +678,82 @@ class _CustomersScreenState extends State<CustomersScreen> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: AppTextField(
-                    label: 'اسم المالك',
+                    label: '\u0627\u0633\u0645 \u0627\u0644\u0645\u0627\u0644\u0643',
                     prefixIcon: Icons.person_outline,
                     controller: ownerController,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
                   child: AppTextField(
-                    label: 'رقم القطعة',
+                    label: '\u0631\u0642\u0645 \u0627\u0644\u0642\u0637\u0639\u0629',
                     prefixIcon: Icons.location_on_outlined,
                     controller: plotController,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 16),
                 Expanded(
                   child: AppTextField(
-                    label: 'رقم الهاتف',
+                    label: '\u0631\u0642\u0645 \u0627\u0644\u0645\u0634\u0631\u0648\u0639',
+                    hint: '\u0623\u062f\u062e\u0644 \u0631\u0642\u0645 \u0627\u0644\u0645\u0634\u0631\u0648\u0639',
+                    prefixIcon: Icons.assignment_outlined,
+                    controller: projectNumberController,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: AppTextField(
+                    label: '\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062a\u0641',
                     prefixIcon: Icons.phone_outlined,
                     keyboardType: TextInputType.phone,
                     controller: phoneController,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                const Expanded(child: SizedBox()),
+              ],
+            ),
+            const SizedBox(height: 16),
+            AppTextField(
+              label: '\u0627\u0644\u0639\u0646\u0648\u0627\u0646',
+              hint: '\u0623\u062f\u062e\u0644 \u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u062a\u0641\u0635\u064a\u0644\u064a',
+              prefixIcon: Icons.home_outlined,
+              maxLines: 2,
+              controller: addressController,
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: AppTextField(
+                    label: '\u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645',
+                    hint: '\u0623\u062f\u062e\u0644 \u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645',
+                    prefixIcon: Icons.account_circle_outlined,
+                    controller: usernameController,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: AppTextField(
+                    label: '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
+                    hint: '\u0623\u062f\u062e\u0644 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
+                    prefixIcon: Icons.lock_outline,
+                    controller: passwordController,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
             AppTextField(
-              label: 'ملاحظات',
+              label: '\u0645\u0644\u0627\u062d\u0638\u0627\u062a',
               maxLines: 3,
               controller: notesController,
             ),
@@ -648,19 +763,33 @@ class _CustomersScreenState extends State<CustomersScreen> {
           if (nameController.text.isEmpty || plotController.text.isEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('يرجى إدخال اسم العميل ورقم القطعة'),
+                content: Text('\u064a\u0631\u062c\u0649 \u0625\u062f\u062e\u0627\u0644 \u0627\u0633\u0645 \u0627\u0644\u0639\u0645\u064a\u0644 \u0648\u0631\u0642\u0645 \u0627\u0644\u0642\u0637\u0639\u0629'),
                 backgroundColor: Colors.red,
               ),
             );
             return;
           }
 
+          // Combine address and notes
+          final address = addressController.text.trim();
+          final notes = notesController.text.trim();
+          String? combinedNotes;
+          if (address.isNotEmpty || notes.isNotEmpty) {
+            final parts = <String>[];
+            if (address.isNotEmpty) parts.add('\u0627\u0644\u0639\u0646\u0648\u0627\u0646: $address');
+            if (notes.isNotEmpty) parts.add(notes);
+            combinedNotes = parts.join('\n');
+          }
+
           final updatedCustomer = customer.copyWith(
             customerName: nameController.text,
             ownerName: ownerController.text.isEmpty ? null : ownerController.text,
             plotNumber: plotController.text,
+            projectNumber: projectNumberController.text.isEmpty ? null : projectNumberController.text,
             phone: phoneController.text.isEmpty ? null : phoneController.text,
-            notes: notesController.text.isEmpty ? null : notesController.text,
+            username: usernameController.text.isEmpty ? null : usernameController.text,
+            password: passwordController.text.isEmpty ? null : passwordController.text,
+            notes: combinedNotes,
           );
 
           context.read<CustomerBloc>().add(UpdateCustomer(customer.id, updatedCustomer));
@@ -769,24 +898,70 @@ class _CustomersScreenState extends State<CustomersScreen> {
             ),
             const SizedBox(height: 20),
 
+            if (customer.username != null || customer.password != null) ...[
+              AppCard(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Row(
+                      children: [
+                        Icon(Icons.account_circle_outlined, size: 18, color: AppColors.primary),
+                        SizedBox(width: 8),
+                        Text(
+                          '\u0628\u064a\u0627\u0646\u0627\u062a \u0627\u0644\u062d\u0633\u0627\u0628',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    if (customer.username != null)
+                      _buildCopyableField('\u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645', customer.username!),
+                    if (customer.password != null) ...[
+                      const SizedBox(height: 8),
+                      _buildCopyableField('\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', customer.password!),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
             if (customer.notes != null) ...[
-              _buildInfoRow('ملاحظات', customer.notes!),
+              _buildInfoRow('\u0645\u0644\u0627\u062d\u0638\u0627\u062a', customer.notes!),
               const SizedBox(height: 8),
             ],
             _buildInfoRow(
-              'تاريخ الإضافة',
+              '\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0625\u0636\u0627\u0641\u0629',
               '${customer.createdAt.day}/${customer.createdAt.month}/${customer.createdAt.year}',
             ),
           ],
         ),
         actions: [
           AppButton(
-            text: 'إغلاق',
+            text: '\u0625\u063a\u0644\u0627\u0642',
             variant: AppButtonVariant.ghost,
             onPressed: () => Navigator.of(dialogContext).pop(),
           ),
           AppButton(
-            text: 'تعديل',
+            text: '\u0639\u0631\u0636 \u0627\u0644\u0645\u0631\u0627\u062d\u0644',
+            icon: Icons.timeline,
+            variant: AppButtonVariant.outline,
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CustomerStagesScreen(customer: customer),
+                ),
+              );
+            },
+          ),
+          AppButton(
+            text: '\u062a\u0639\u062f\u064a\u0644',
             icon: Icons.edit,
             onPressed: () {
               Navigator.of(dialogContext).pop();
@@ -814,6 +989,47 @@ class _CustomersScreenState extends State<CustomersScreen> {
         ),
         Expanded(
           child: Text(value),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCopyableField(String label, String value) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 110,
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w500,
+              fontSize: 13,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
+            ),
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.copy, size: 18, color: AppColors.textSecondary),
+          tooltip: '\u0646\u0633\u062e',
+          onPressed: () {
+            Clipboard.setData(ClipboardData(text: value));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('\u062a\u0645 \u0646\u0633\u062e $label'),
+                duration: const Duration(seconds: 1),
+                backgroundColor: Colors.green,
+              ),
+            );
+          },
         ),
       ],
     );

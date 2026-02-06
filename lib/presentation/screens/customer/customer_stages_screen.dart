@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../core/di/service_locator.dart';
 import '../../../domain/models/customer.dart';
 import '../../../domain/models/license.dart';
@@ -256,15 +257,85 @@ class _CustomerStagesScreenState extends State<CustomerStagesScreen> {
                   const Icon(Icons.info_outline, size: 18, color: Colors.blue),
                   const SizedBox(width: 8),
                   Text(
-                    'المرحلة الحالية: ${widget.customer.currentStage}',
+                    '\u0627\u0644\u0645\u0631\u062d\u0644\u0629 \u0627\u0644\u062d\u0627\u0644\u064a\u0629: ${widget.customer.currentStage}',
                     style: const TextStyle(fontWeight: FontWeight.w500),
                   ),
                 ],
               ),
             ],
+            if (widget.customer.username != null || widget.customer.password != null) ...[
+              const SizedBox(height: 12),
+              const Divider(),
+              const SizedBox(height: 8),
+              const Text(
+                '\u0628\u064a\u0627\u0646\u0627\u062a \u0627\u0644\u062d\u0633\u0627\u0628',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              if (widget.customer.username != null)
+                _buildCopyableField(
+                  icon: Icons.person_outline,
+                  label: '\u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645',
+                  value: widget.customer.username!,
+                ),
+              if (widget.customer.password != null) ...[
+                const SizedBox(height: 8),
+                _buildCopyableField(
+                  icon: Icons.lock_outline,
+                  label: '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
+                  value: widget.customer.password!,
+                ),
+              ],
+            ],
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildCopyableField({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: Colors.grey[600]),
+        const SizedBox(width: 8),
+        Text(
+          '$label: ',
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[600],
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.copy, size: 18),
+          tooltip: '\u0646\u0633\u062e',
+          onPressed: () {
+            Clipboard.setData(ClipboardData(text: value));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('\u062a\u0645 \u0646\u0633\u062e $label'),
+                duration: const Duration(seconds: 1),
+                backgroundColor: Colors.green,
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 

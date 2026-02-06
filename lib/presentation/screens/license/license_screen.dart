@@ -13,6 +13,7 @@ import '../../widgets/common/app_card.dart';
 import '../../widgets/common/app_button.dart';
 import '../../widgets/common/app_dialog.dart';
 import '../../widgets/common/app_text_field.dart';
+import '../../widgets/common/customer_search_field.dart';
 
 class LicenseScreen extends StatelessWidget {
   final int? initialCustomerId;
@@ -39,8 +40,6 @@ class LicenseScreenView extends StatefulWidget {
 
 class _LicenseScreenViewState extends State<LicenseScreenView> {
   Customer? _selectedCustomer;
-  List<Customer> _customers = [];
-  bool _loadingCustomers = true;
 
   // Step names in order (matching the License model)
   static const _stepNames = [
@@ -96,27 +95,18 @@ class _LicenseScreenViewState extends State<LicenseScreenView> {
   @override
   void initState() {
     super.initState();
-    _loadCustomers();
+    _loadInitialCustomer();
   }
 
-  Future<void> _loadCustomers() async {
+  Future<void> _loadInitialCustomer() async {
+    if (widget.initialCustomerId == null) return;
     try {
-      final customers = await getIt<CustomerService>().getAllCustomers();
-      setState(() {
-        _customers = customers;
-        _loadingCustomers = false;
-
-        if (widget.initialCustomerId != null) {
-          final initial = customers.where((c) => c.id == widget.initialCustomerId).firstOrNull;
-          if (initial != null) {
-            _selectedCustomer = initial;
-            context.read<LicenseBloc>().add(LoadLicenseForCustomer(initial.id));
-          }
-        }
-      });
-    } catch (e) {
-      setState(() => _loadingCustomers = false);
-    }
+      final customer = await getIt<CustomerService>().getCustomer(widget.initialCustomerId!);
+      if (customer != null && mounted) {
+        setState(() => _selectedCustomer = customer);
+        context.read<LicenseBloc>().add(LoadLicenseForCustomer(customer.id));
+      }
+    } catch (_) {}
   }
 
   @override
@@ -154,29 +144,17 @@ class _LicenseScreenViewState extends State<LicenseScreenView> {
     return AppSectionCard(
       title: 'اختيار العميل',
       icon: Icons.person_outline,
-      child: _loadingCustomers
-          ? const LinearProgressIndicator()
-          : DropdownButtonFormField<Customer>(
-              decoration: InputDecoration(
-                labelText: 'اختر العميل',
-                border: const OutlineInputBorder(),
-              ),
-              value: _selectedCustomer,
-              items: _customers.map((c) {
-                return DropdownMenuItem(
-                  value: c,
-                  child: Text(c.customerName),
+      child: CustomerSearchField(
+        initialCustomer: _selectedCustomer,
+        onSelected: (customer) {
+          setState(() => _selectedCustomer = customer);
+          if (customer != null) {
+            context.read<LicenseBloc>().add(
+                  LoadLicenseForCustomer(customer.id),
                 );
-              }).toList(),
-              onChanged: (customer) {
-                setState(() => _selectedCustomer = customer);
-                if (customer != null) {
-                  context.read<LicenseBloc>().add(
-                        LoadLicenseForCustomer(customer.id),
-                      );
-                }
-              },
-            ),
+          }
+        },
+      ),
     );
   }
 

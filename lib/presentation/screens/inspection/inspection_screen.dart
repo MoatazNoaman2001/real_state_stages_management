@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/di/service_locator.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../data/repositories/inspection_repository.dart';
 import '../../../domain/models/inspection.dart';
 import '../../../domain/models/customer.dart';
@@ -7,6 +8,8 @@ import '../../../domain/services/customer_service.dart';
 import '../../widgets/layout/app_layout.dart';
 import '../../widgets/common/app_card.dart';
 import '../../widgets/common/app_button.dart';
+import '../../widgets/common/app_dialog.dart';
+import '../../widgets/common/customer_search_field.dart';
 
 class InspectionScreen extends StatefulWidget {
   const InspectionScreen({super.key});
@@ -286,84 +289,70 @@ class _InspectionScreenState extends State<InspectionScreen> {
     final reasonController = TextEditingController();
     DateTime? selectedDate;
 
-    showDialog(
+    AppDialog.show(
       context: context,
       builder: (ctx) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: const Text('معاينة جديدة'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                DropdownButtonFormField<Customer>(
-                  decoration: const InputDecoration(
-                    labelText: 'العميل',
-                    border: OutlineInputBorder(),
-                  ),
-                  value: selectedCustomer,
-                  items: _customers.map((c) {
-                    return DropdownMenuItem(
-                      value: c,
-                      child: Text(c.customerName),
-                    );
-                  }).toList(),
-                  onChanged: (c) => setDialogState(() => selectedCustomer = c),
+        builder: (context, setDialogState) => AppFormDialog(
+          title: '\u0645\u0639\u0627\u064a\u0646\u0629 \u062c\u062f\u064a\u062f\u0629',
+          saveText: '\u0625\u0636\u0627\u0641\u0629',
+          onSave: selectedCustomer == null
+              ? null
+              : () async {
+                  Navigator.pop(ctx);
+                  await _repo.insert(Inspection(
+                    id: 0,
+                    customerId: selectedCustomer!.id,
+                    reason: reasonController.text.isEmpty
+                        ? null
+                        : reasonController.text,
+                    inspectionDate: selectedDate,
+                    createdAt: DateTime.now(),
+                    updatedAt: DateTime.now(),
+                  ));
+                  await _loadData();
+                },
+          onCancel: () => Navigator.pop(ctx),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CustomerSearchField(
+                onSelected: (c) {
+                  setDialogState(() => selectedCustomer = c);
+                },
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: reasonController,
+                decoration: const InputDecoration(
+                  labelText: '\u0627\u0644\u0633\u0628\u0628',
+                  border: OutlineInputBorder(),
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: reasonController,
-                  decoration: const InputDecoration(
-                    labelText: 'السبب',
-                    border: OutlineInputBorder(),
-                  ),
-                  maxLines: 2,
+                maxLines: 2,
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: const BorderSide(color: AppColors.border),
                 ),
-                const SizedBox(height: 16),
-                ListTile(
-                  title: Text(selectedDate != null
-                      ? _formatDate(selectedDate!)
-                      : 'اختر تاريخ المعاينة'),
-                  trailing: const Icon(Icons.calendar_today),
-                  onTap: () async {
-                    final date = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime(2030),
-                    );
-                    if (date != null) {
-                      setDialogState(() => selectedDate = date);
-                    }
-                  },
-                ),
-              ],
-            ),
+                title: Text(selectedDate != null
+                    ? _formatDate(selectedDate!)
+                    : '\u0627\u062e\u062a\u0631 \u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0645\u0639\u0627\u064a\u0646\u0629'),
+                trailing: const Icon(Icons.calendar_today),
+                onTap: () async {
+                  final date = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2020),
+                    lastDate: DateTime(2030),
+                  );
+                  if (date != null) {
+                    setDialogState(() => selectedDate = date);
+                  }
+                },
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('إلغاء'),
-            ),
-            ElevatedButton(
-              onPressed: selectedCustomer == null
-                  ? null
-                  : () async {
-                      Navigator.pop(ctx);
-                      await _repo.insert(Inspection(
-                        id: 0,
-                        customerId: selectedCustomer!.id,
-                        reason: reasonController.text.isEmpty
-                            ? null
-                            : reasonController.text,
-                        inspectionDate: selectedDate,
-                        createdAt: DateTime.now(),
-                        updatedAt: DateTime.now(),
-                      ));
-                      await _loadData();
-                    },
-              child: const Text('إضافة'),
-            ),
-          ],
         ),
       ),
     );

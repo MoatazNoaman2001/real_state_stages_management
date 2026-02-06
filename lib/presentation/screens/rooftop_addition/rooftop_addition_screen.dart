@@ -8,6 +8,7 @@ import '../../../domain/services/customer_service.dart';
 import '../../widgets/layout/app_layout.dart';
 import '../../widgets/common/app_card.dart';
 import '../../widgets/common/app_button.dart';
+import '../../widgets/common/customer_search_field.dart';
 
 class RooftopAdditionScreen extends StatelessWidget {
   final int? initialCustomerId;
@@ -31,8 +32,6 @@ class _RooftopAdditionView extends StatefulWidget {
 
 class _RooftopAdditionViewState extends State<_RooftopAdditionView> {
   Customer? _selectedCustomer;
-  List<Customer> _customers = [];
-  bool _loadingCustomers = true;
   RooftopAddition? _rooftop;
   bool _loadingRooftop = false;
   String? _error;
@@ -82,27 +81,18 @@ class _RooftopAdditionViewState extends State<_RooftopAdditionView> {
   @override
   void initState() {
     super.initState();
-    _loadCustomers();
+    _loadInitialCustomer();
   }
 
-  Future<void> _loadCustomers() async {
+  Future<void> _loadInitialCustomer() async {
+    if (widget.initialCustomerId == null) return;
     try {
-      final customers = await getIt<CustomerService>().getAllCustomers();
-      setState(() {
-        _customers = customers;
-        _loadingCustomers = false;
-
-        if (widget.initialCustomerId != null) {
-          final initial = customers.where((c) => c.id == widget.initialCustomerId).firstOrNull;
-          if (initial != null) {
-            _selectedCustomer = initial;
-            _loadRooftop(initial.id);
-          }
-        }
-      });
-    } catch (e) {
-      setState(() => _loadingCustomers = false);
-    }
+      final customer = await getIt<CustomerService>().getCustomer(widget.initialCustomerId!);
+      if (customer != null && mounted) {
+        setState(() => _selectedCustomer = customer);
+        _loadRooftop(customer.id);
+      }
+    } catch (_) {}
   }
 
   Future<void> _loadRooftop(int customerId) async {
@@ -233,27 +223,15 @@ class _RooftopAdditionViewState extends State<_RooftopAdditionView> {
     return AppSectionCard(
       title: 'اختيار العميل',
       icon: Icons.person_outline,
-      child: _loadingCustomers
-          ? const LinearProgressIndicator()
-          : DropdownButtonFormField<Customer>(
-              decoration: const InputDecoration(
-                labelText: 'اختر العميل',
-                border: OutlineInputBorder(),
-              ),
-              value: _selectedCustomer,
-              items: _customers.map((c) {
-                return DropdownMenuItem(
-                  value: c,
-                  child: Text(c.customerName),
-                );
-              }).toList(),
-              onChanged: (customer) {
-                setState(() => _selectedCustomer = customer);
-                if (customer != null) {
-                  _loadRooftop(customer.id);
-                }
-              },
-            ),
+      child: CustomerSearchField(
+        initialCustomer: _selectedCustomer,
+        onSelected: (customer) {
+          setState(() => _selectedCustomer = customer);
+          if (customer != null) {
+            _loadRooftop(customer.id);
+          }
+        },
+      ),
     );
   }
 

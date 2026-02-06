@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/di/service_locator.dart';
 import '../../../domain/models/customer.dart';
 import '../../../domain/services/customer_service.dart';
@@ -12,8 +13,9 @@ import '../../../data/repositories/rooftop_addition_repository.dart';
 import '../../widgets/layout/app_layout.dart';
 import '../../widgets/common/app_card.dart';
 import '../../widgets/common/app_button.dart';
+import '../../widgets/common/app_dialog.dart';
+import '../../widgets/common/app_text_field.dart';
 import '../../blocs/customer/customer_bloc.dart';
-import '../customer/customer_form_dialog.dart';
 import '../customer/customer_stages_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -464,28 +466,165 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  void _showAddCustomerDialog() async {
-    // Create a temporary CustomerBloc for the dialog
-    final customerBloc = CustomerBloc(getIt<CustomerService>());
+  void _showAddCustomerDialog() {
+    final nameController = TextEditingController();
+    final ownerController = TextEditingController();
+    final plotController = TextEditingController();
+    final projectNumberController = TextEditingController();
+    final phoneController = TextEditingController();
+    final addressController = TextEditingController();
+    final usernameController = TextEditingController();
+    final passwordController = TextEditingController();
+    final notesController = TextEditingController();
 
-    // Listen to bloc state changes
-    final subscription = customerBloc.stream.listen((state) {
-      if (state is CustomerOperationSuccess) {
-        // Refresh data when customer is successfully added
-        _loadData();
-      }
-    });
-
-    await showDialog<Customer>(
+    AppDialog.show(
       context: context,
-      builder: (context) => CustomerFormDialog(
-        customerBloc: customerBloc,
+      builder: (dialogContext) => AppFormDialog(
+        title: '\u0625\u0636\u0627\u0641\u0629 \u0639\u0645\u064a\u0644 \u062c\u062f\u064a\u062f',
+        width: 600,
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: AppTextField(
+                    label: '\u0627\u0633\u0645 \u0627\u0644\u0639\u0645\u064a\u0644',
+                    hint: '\u0623\u062f\u062e\u0644 \u0627\u0633\u0645 \u0627\u0644\u0639\u0645\u064a\u0644',
+                    prefixIcon: Icons.person_outline,
+                    controller: nameController,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: AppTextField(
+                    label: '\u0627\u0633\u0645 \u0627\u0644\u0645\u0627\u0644\u0643',
+                    hint: '\u0623\u062f\u062e\u0644 \u0627\u0633\u0645 \u0627\u0644\u0645\u0627\u0644\u0643',
+                    prefixIcon: Icons.person_outline,
+                    controller: ownerController,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: AppTextField(
+                    label: '\u0631\u0642\u0645 \u0627\u0644\u0642\u0637\u0639\u0629',
+                    hint: '\u0645\u062b\u0627\u0644: \u0642\u0637\u0639\u0629 45',
+                    prefixIcon: Icons.location_on_outlined,
+                    controller: plotController,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: AppTextField(
+                    label: '\u0631\u0642\u0645 \u0627\u0644\u0645\u0634\u0631\u0648\u0639',
+                    hint: '\u0623\u062f\u062e\u0644 \u0631\u0642\u0645 \u0627\u0644\u0645\u0634\u0631\u0648\u0639',
+                    prefixIcon: Icons.assignment_outlined,
+                    controller: projectNumberController,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: AppTextField(
+                    label: '\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062a\u0641',
+                    hint: '01xxxxxxxxx',
+                    prefixIcon: Icons.phone_outlined,
+                    keyboardType: TextInputType.phone,
+                    controller: phoneController,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                const Expanded(child: SizedBox()),
+              ],
+            ),
+            const SizedBox(height: 16),
+            AppTextField(
+              label: '\u0627\u0644\u0639\u0646\u0648\u0627\u0646',
+              hint: '\u0623\u062f\u062e\u0644 \u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u062a\u0641\u0635\u064a\u0644\u064a',
+              prefixIcon: Icons.home_outlined,
+              maxLines: 2,
+              controller: addressController,
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: AppTextField(
+                    label: '\u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645',
+                    hint: '\u0623\u062f\u062e\u0644 \u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645',
+                    prefixIcon: Icons.account_circle_outlined,
+                    controller: usernameController,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: AppTextField(
+                    label: '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
+                    hint: '\u0623\u062f\u062e\u0644 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
+                    prefixIcon: Icons.lock_outline,
+                    controller: passwordController,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            AppTextField(
+              label: '\u0645\u0644\u0627\u062d\u0638\u0627\u062a',
+              hint: '\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0625\u0636\u0627\u0641\u064a\u0629...',
+              maxLines: 3,
+              controller: notesController,
+            ),
+          ],
+        ),
+        onSave: () {
+          if (nameController.text.isEmpty || plotController.text.isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('\u064a\u0631\u062c\u0649 \u0625\u062f\u062e\u0627\u0644 \u0627\u0633\u0645 \u0627\u0644\u0639\u0645\u064a\u0644 \u0648\u0631\u0642\u0645 \u0627\u0644\u0642\u0637\u0639\u0629'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            return;
+          }
+
+          // Combine address and notes
+          final address = addressController.text.trim();
+          final notes = notesController.text.trim();
+          String? combinedNotes;
+          if (address.isNotEmpty || notes.isNotEmpty) {
+            final parts = <String>[];
+            if (address.isNotEmpty) parts.add('\u0627\u0644\u0639\u0646\u0648\u0627\u0646: $address');
+            if (notes.isNotEmpty) parts.add(notes);
+            combinedNotes = parts.join('\n');
+          }
+
+          final customer = Customer(
+            id: 0,
+            customerName: nameController.text,
+            ownerName: ownerController.text.isEmpty ? null : ownerController.text,
+            plotNumber: plotController.text,
+            projectNumber: projectNumberController.text.isEmpty ? null : projectNumberController.text,
+            username: usernameController.text.isEmpty ? null : usernameController.text,
+            password: passwordController.text.isEmpty ? null : passwordController.text,
+            phone: phoneController.text.isEmpty ? null : phoneController.text,
+            notes: combinedNotes,
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+          );
+
+          context.read<CustomerBloc>().add(CreateCustomer(customer));
+          Navigator.of(dialogContext).pop();
+          _loadData();
+        },
       ),
     );
-
-    // Cancel subscription and refresh data after dialog closes
-    await subscription.cancel();
-    _loadData();
   }
 
   void _showCustomerStages(Customer customer) {

@@ -1,16 +1,41 @@
-# real_state_management_stages
+# Real State Management Stages
 
-A new Flutter project.
+A Flutter desktop/web application for managing real estate project stages and customer tracking.
+
+## Features
+
+- **Customer Management** - Add, edit, view, and delete customers with full details
+- **Stage Tracking** - Track customers through multiple project stages (Licenses, Excavation, Execution, Modifications, Meters, Road Work, Rooftop)
+- **Dashboard** - Overview with stats, recent customers, and quick-add functionality
+- **Inspections & Supervision** - Manage inspections and supervision records
+
+## Customer Fields
+
+Each customer record includes:
+- Customer name, owner name
+- Plot number, project number
+- Phone number
+- Address (stored within notes)
+- Username & password (account credentials)
+- Current stage, notes
+
+## Tech Stack
+
+- **Flutter** (Windows desktop / Web)
+- **PostgreSQL** database
+- **BLoC** pattern for state management
+- **Freezed** for immutable data models
+- **GetIt** for dependency injection
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Ensure Flutter is installed and configured for desktop/web
+2. Set up a PostgreSQL database and configure connection in `lib/core/config/database_config.dart`
+3. Run code generation:
+   ```bash
+   flutter pub run build_runner build
+   ```
+4. Run the app:
+   ```bash
+   flutter run -d windows
+   ```
