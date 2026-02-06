@@ -1,0 +1,28 @@
+targets:
+  $default:
+    builders:
+      # Freezed builder configuration
+      freezed:
+        options:
+          # Generate toString, == and hashCode
+          equal: true
+          to_string: true
+          # Use unmodifiable collections
+          make_collections_unmodifiable: true
+          # Generate copyWith method
+          copy_with: true
+          # Don't generate when/maybeWhen for simple classes
+          when:
+            always_use_fallback: false
+
+      # JSON serializable configuration
+      json_serializable:
+        options:
+          # Use field rename for snake_case (common in APIs)
+          field_rename: snake
+          # Explicitly handle null values
+          explicit_to_json: true
+          # Include fields with null values in JSON
+          include_if_null: false
+          # Check required keys exist
+          checked: true
